@@ -1,0 +1,8 @@
+{
+  "passed": true,
+  "count": 16,
+  "max_metric_difference": 0.0,
+  "upstream_commit": "9574766fe0ed96c2b8be3b1a63e6998c0a08b768",
+  "checkpoint_step": 9000,
+  "notes": "New independent project reproduces historical per-image metrics exactly."
+}

@@ -1,0 +1,36 @@
+{
+  "counts": {
+    "train": {
+      "triplets": 110096,
+      "sources": 6881,
+      "scenes": 6857
+    },
+    "val": {
+      "triplets": 1496,
+      "sources": 374,
+      "scenes": 371
+    },
+    "test": {
+      "triplets": 1496,
+      "sources": 374,
+      "scenes": 373
+    }
+  },
+  "split_overlap": {
+    "train_val": {
+      "source": 0,
+      "scene": 0,
+      "gt_sha256": 0
+    },
+    "train_test": {
+      "source": 0,
+      "scene": 0,
+      "gt_sha256": 0
+    },
+    "val_test": {
+      "source": 0,
+      "scene": 0,
+      "gt_sha256": 0
+    }
+  }
+}

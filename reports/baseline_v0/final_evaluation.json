@@ -1,0 +1,323 @@
+{
+  "checkpoint": "/home/dancer/mfif/ICME/Mask-DiFuser/experiments/mfif_scratch_20261119/checkpoints/best.pt",
+  "step": 9000,
+  "initialization": "random",
+  "results": {
+    "val": {
+      "fusion": {
+        "psnr": 22.108289135794124,
+        "ssim": 0.8525809083074172,
+        "mae": 0.07492630817880107,
+        "laplacian_mae": 0.03776423113525193
+      },
+      "average": {
+        "psnr": 31.701824875503203,
+        "ssim": 0.9349797609894671,
+        "mae": 0.017863360164989125,
+        "laplacian_mae": 0.035103922748653704
+      },
+      "count": 1496,
+      "ddim_steps": 5,
+      "eta": 1,
+      "seed": 3407,
+      "protocol": "official-MFF-sampler_minmax_rgb-u8_v1"
+    },
+    "test": {
+      "fusion": {
+        "psnr": 21.588647856313713,
+        "ssim": 0.848471879759893,
+        "mae": 0.0818532883254363,
+        "laplacian_mae": 0.03759548419160161
+      },
+      "average": {
+        "psnr": 31.975367635961458,
+        "ssim": 0.9361486485536723,
+        "mae": 0.017503005917356654,
+        "laplacian_mae": 0.03344575206064812
+      },
+      "count": 1496,
+      "ddim_steps": 5,
+      "eta": 1,
+      "seed": 3407,
+      "protocol": "official-MFF-sampler_minmax_rgb-u8_v1"
+    },
+    "disk": {
+      "fusion": {
+        "psnr": 21.447105977288118,
+        "ssim": 0.8468217800326526,
+        "mae": 0.08368298448721834,
+        "laplacian_mae": 0.03743029622869058
+      },
+      "average": {
+        "psnr": 30.937249033341196,
+        "ssim": 0.9217052195161421,
+        "mae": 0.019581350045469167,
+        "laplacian_mae": 0.03610522011674711
+      },
+      "count": 374,
+      "ddim_steps": 5,
+      "eta": 1,
+      "seed": 3407,
+      "protocol": "official-MFF-sampler_minmax_rgb-u8_v1"
+    },
+    "wide": {
+      "fusion": {
+        "psnr": 21.452327070365033,
+        "ssim": 0.8480211865694766,
+        "mae": 0.08361809771946248,
+        "laplacian_mae": 0.03707689459729482
+      },
+      "average": {
+        "psnr": 31.54830965058132,
+        "ssim": 0.9326063217645023,
+        "mae": 0.018265695664421582,
+        "laplacian_mae": 0.03483268013690912
+      },
+      "count": 374,
+      "ddim_steps": 5,
+      "eta": 1,
+      "seed": 3407,
+      "protocol": "official-MFF-sampler_minmax_rgb-u8_v1"
+    },
+    "real": {
+      "protocol": "official native-size reflect-pad/sample/crop/minmax; no GT metrics",
+      "steps": 5,
+      "eta": 1,
+      "seed": 3407,
+      "pairs": 33,
+      "records": [
+        {
+          "dataset": "Lytro",
+          "sample": "lytro-01-A",
+          "height": 520,
+          "width": 520,
+          "seconds": 3.3487542420625687
+        },
+        {
+          "dataset": "Lytro",
+          "sample": "lytro-09-A",
+          "height": 520,
+          "width": 520,
+          "seconds": 3.17576914280653
+        },
+        {
+          "dataset": "Lytro",
+          "sample": "lytro-17-A",
+          "height": 520,
+          "width": 520,
+          "seconds": 3.252434303984046
+        },
+        {
+          "dataset": "MFFW",
+          "sample": "mffw_01_A",
+          "height": 200,
+          "width": 300,
+          "seconds": 0.5757048260420561
+        },
+        {
+          "dataset": "MFFW",
+          "sample": "mffw_09_A",
+          "height": 448,
+          "width": 584,
+          "seconds": 2.933724207803607
+        },
+        {
+          "dataset": "Lytro",
+          "sample": "lytro-02-A",
+          "height": 520,
+          "width": 520,
+          "seconds": 3.243950631469488
+        },
+        {
+          "dataset": "Lytro",
+          "sample": "lytro-10-A",
+          "height": 520,
+          "width": 520,
+          "seconds": 3.0791972000151873
+        },
+        {
+          "dataset": "Lytro",
+          "sample": "lytro-18-A",
+          "height": 520,
+          "width": 520,
+          "seconds": 3.2044263016432524
+        },
+        {
+          "dataset": "MFFW",
+          "sample": "mffw_02_A",
+          "height": 368,
+          "width": 592,
+          "seconds": 2.2381386030465364
+        },
+        {
+          "dataset": "MFFW",
+          "sample": "mffw_10_A",
+          "height": 600,
+          "width": 600,
+          "seconds": 4.829219918698072
+        },
+        {
+          "dataset": "Lytro",
+          "sample": "lytro-03-A",
+          "height": 520,
+          "width": 520,
+          "seconds": 3.295592036098242
+        },
+        {
+          "dataset": "Lytro",
+          "sample": "lytro-11-A",
+          "height": 520,
+          "width": 520,
+          "seconds": 3.150542214512825
+        },
+        {
+          "dataset": "Lytro",
+          "sample": "lytro-19-A",
+          "height": 520,
+          "width": 520,
+          "seconds": 3.1793373208492994
+        },
+        {
+          "dataset": "MFFW",
+          "sample": "mffw_03_A",
+          "height": 880,
+          "width": 520,
+          "seconds": 7.107576722279191
+        },
+        {
+          "dataset": "MFFW",
+          "sample": "mffw_11_A",
+          "height": 624,
+          "width": 432,
+          "seconds": 3.0888401474803686
+        },
+        {
+          "dataset": "Lytro",
+          "sample": "lytro-04-A",
+          "height": 520,
+          "width": 520,
+          "seconds": 3.293224271386862
+        },
+        {
+          "dataset": "Lytro",
+          "sample": "lytro-12-A",
+          "height": 520,
+          "width": 520,
+          "seconds": 3.161338100209832
+        },
+        {
+          "dataset": "Lytro",
+          "sample": "lytro-20-A",
+          "height": 520,
+          "width": 520,
+          "seconds": 3.2237374391406775
+        },
+        {
+          "dataset": "MFFW",
+          "sample": "mffw_04_A",
+          "height": 580,
+          "width": 780,
+          "seconds": 7.187755456194282
+        },
+        {
+          "dataset": "MFFW",
+          "sample": "mffw_12_A",
+          "height": 304,
+          "width": 576,
+          "seconds": 1.6281951293349266
+        },
+        {
+          "dataset": "Lytro",
+          "sample": "lytro-05-A",
+          "height": 520,
+          "width": 520,
+          "seconds": 3.280401786789298
+        },
+        {
+          "dataset": "Lytro",
+          "sample": "lytro-13-A",
+          "height": 520,
+          "width": 520,
+          "seconds": 3.1612319573760033
+        },
+        {
+          "dataset": "MFFW",
+          "sample": "mffw_05_A",
+          "height": 248,
+          "width": 388,
+          "seconds": 0.8561869766563177
+        },
+        {
+          "dataset": "MFFW",
+          "sample": "mffw_13_A",
+          "height": 300,
+          "width": 448,
+          "seconds": 1.222411872819066
+        },
+        {
+          "dataset": "Lytro",
+          "sample": "lytro-06-A",
+          "height": 520,
+          "width": 520,
+          "seconds": 3.273050842806697
+        },
+        {
+          "dataset": "Lytro",
+          "sample": "lytro-14-A",
+          "height": 520,
+          "width": 520,
+          "seconds": 3.1581809129565954
+        },
+        {
+          "dataset": "MFFW",
+          "sample": "mffw_06_A",
+          "height": 868,
+          "width": 568,
+          "seconds": 8.191987654194236
+        },
+        {
+          "dataset": "Lytro",
+          "sample": "lytro-07-A",
+          "height": 520,
+          "width": 520,
+          "seconds": 3.2921500261873007
+        },
+        {
+          "dataset": "Lytro",
+          "sample": "lytro-15-A",
+          "height": 520,
+          "width": 520,
+          "seconds": 3.1458726841956377
+        },
+        {
+          "dataset": "MFFW",
+          "sample": "mffw_07_A",
+          "height": 520,
+          "width": 584,
+          "seconds": 3.735759036615491
+        },
+        {
+          "dataset": "Lytro",
+          "sample": "lytro-08-A",
+          "height": 520,
+          "width": 520,
+          "seconds": 3.238462371751666
+        },
+        {
+          "dataset": "Lytro",
+          "sample": "lytro-16-A",
+          "height": 520,
+          "width": 520,
+          "seconds": 3.2386656254529953
+        },
+        {
+          "dataset": "MFFW",
+          "sample": "mffw_08_A",
+          "height": 560,
+          "width": 560,
+          "seconds": 3.764621937647462
+        }
+      ]
+    }
+  }
+}

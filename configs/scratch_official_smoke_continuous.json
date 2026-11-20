@@ -1,0 +1,23 @@
+{
+  "output": "${PROJECT_ROOT}/experiments/scratch_official_smoke_continuous",
+  "train_root": "${DATA_ROOT}/train/MFIF",
+  "val_root": "${DATA_ROOT}/val/MFIF",
+  "seed": 20261119,
+  "eval_seed": 3407,
+  "dropout": 0.1,
+  "batch_per_gpu": 1,
+  "accumulation": 4,
+  "workers": 2,
+  "cpu_threads": 2,
+  "lr": 5e-05,
+  "max_steps": 6,
+  "train_limit": 128,
+  "monitor_count": 8,
+  "ddim_steps": 5,
+  "initial_eval": false,
+  "log_every": 1,
+  "eval_every": 100,
+  "checkpoint_every": 100,
+  "schedule_epoch_steps": 1,
+  "change_epoch": 2
+}

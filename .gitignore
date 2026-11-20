@@ -1,0 +1,19 @@
+# Reproducible code/configs/reports belong in Git; runtime data stays on the server.
+/experiments/
+/runs/
+/dataset/
+/data/
+/.envs/
+/.venv/
+/.cache/
+__pycache__/
+*.py[cod]
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.log
+.env
+.env.*
+*.pem
+*.key

@@ -1,0 +1,95 @@
+{
+  "training": {
+    "logs": 1252,
+    "validations": 64,
+    "all_logged_numbers_finite": true,
+    "lr_first": 5e-05,
+    "lr_last": 9.984954184573743e-05,
+    "loss_last": {
+      "event": "train",
+      "step": 31225,
+      "epoch": 9,
+      "cursor": 1060,
+      "schedule_epoch": 1249,
+      "loss": 4.161056339144706,
+      "noise_mse": 0.0014700528800021856,
+      "color_x10": 0.12195744588971139,
+      "image_mse_x10": 0.6111106276168721,
+      "exposure_x10": 1.161372886374593,
+      "ssim_x10": 1.733220158815384,
+      "lpips_x10": 1.6223110961914062,
+      "grad_norm": 746.2478747558594,
+      "seconds_per_step": 1.1821318562794476,
+      "lr": 9.984954184573743e-05,
+      "loss_phase": "full",
+      "best_psnr": 22.17850676160696,
+      "peak_allocated_gib": 14.054340839385986,
+      "time_utc": "2026-11-20T00:59:34.072759+00:00",
+      "status": "running",
+      "deadline_utc": "2026-11-20T01:00:00+00:00",
+      "samples_seen": 999200
+    },
+    "mean_step_seconds": 1.1814737571023881,
+    "max_grad_norm": 1632.1650390625,
+    "started_events": 1,
+    "error_lines": []
+  },
+  "source_integrity": {
+    "Diffusion/model.py": {
+      "current_equals_official": true,
+      "snapshot_equals_official": true
+    },
+    "Diffusion/diffusion.py": {
+      "current_equals_official": true,
+      "snapshot_equals_official": true
+    },
+    "loss/Myloss.py": {
+      "current_equals_official": true,
+      "snapshot_equals_official": true
+    },
+    "Scheduler.py": {
+      "current_equals_official": true,
+      "snapshot_equals_official": true
+    }
+  },
+  "outputs": {
+    "val": {
+      "count": 1496,
+      "unique": 1496,
+      "matches_manifest": true,
+      "beats_average_psnr": 115,
+      "mean_gap": -9.593535739709072
+    },
+    "test": {
+      "count": 1496,
+      "unique": 1496,
+      "matches_manifest": true,
+      "beats_average_psnr": 98,
+      "mean_gap": -10.386719779647743
+    },
+    "disk": {
+      "count": 374,
+      "unique": 374,
+      "matches_manifest": true,
+      "beats_average_psnr": 34,
+      "mean_gap": -9.490143056053082
+    },
+    "wide": {
+      "count": 374,
+      "unique": 374,
+      "matches_manifest": true,
+      "beats_average_psnr": 26,
+      "mean_gap": -10.09598258021629
+    }
+  },
+  "monitor_extrema": {
+    "psnr": {
+      "step": 9000,
+      "value": 22.17850676160696
+    },
+    "ssim": {
+      "step": 27500,
+      "value": 0.907057598233223
+    }
+  }
+}

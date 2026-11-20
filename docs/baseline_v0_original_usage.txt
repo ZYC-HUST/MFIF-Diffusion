@@ -1,0 +1,111 @@
+COME-MFIF scratch baseline
+=========================
+
+Purpose
+-------
+Train the original Mask-DiFuser architecture from random initialization on
+the prepared 256x256 A/B/GT triples. No official fusion checkpoint is loaded.
+Original tracked files are untouched. This is supervised MFIF task adaptation,
+not a reproduction of the paper's general unsupervised masked training dataset.
+
+User constraint (2026-11-19)
+----------------------------
+Retain the official tricks until the MFIF baseline has been evaluated.
+The entry points directly call Diffusion.model.UNet,
+Diffusion.diffusion.GaussianDiffusionTrainer/GaussianDiffusionSampler,
+and Scheduler.GradualWarmupScheduler. The sampler's t+1 indexing,
+terminal alpha, MFF [-1.5,1] clipping, eta=1, constant seed=3407,
+5 inference steps, and per-image min-max normalization are retained.
+There is no corrected or alternate sampler in the active implementation.
+The abandoned initial smoke directory scratch_smoke_resume contains one failed
+engineering step and is NOT an experiment used by the overnight training.
+
+Original objective
+------------------
+100*noise_MSE + 100*color + 5*image_MSE + 5*SSIM_loss + 10*LPIPS.
+Original early phase enables only noise_MSE. Exposure loss is computed but
+has zero weight. The fixed pretrained LPIPS/VGG loss network is retained;
+it is not an initialization for the fusion model. No gradient clipping.
+
+Adaptations
+-----------
+* Read verified MFIF A/B/GT manifests, normalize input/GT to [-1,1].
+  Existing offline augmentations are used; no further degradation is added.
+* 8 GPUs, per-GPU microbatch 1, accumulation 4, effective batch 32.
+  BF16 autocast and FP32 model/optimizer; AdamW lr=5e-5, wd=1e-4.
+* Original recommended DIV2K run: 800 images / (4 GPUs * batch 8) = 25
+  optimizer steps per epoch. For the full 110096-patch MFIF set, keep
+  the same schedule in update units: 25 steps per schedule epoch,
+  noise-only first 5000 updates, original auxiliary losses from update 5001;
+  original 1000-epoch LR warmup = 25000 updates, multiplier=2, followed by
+  original CosineAnnealingLR(T_max=10000 schedule epochs).
+  Thus data-pass epoch and schedule epoch are distinct. This mapping is
+  explicit in config.json; no claim of reproducing 3500 original epochs tonight.
+* Full data shuffles per data epoch; 110080 patches used per epoch, dropping
+  the final 16 to obtain whole global batches. Dropped items change each epoch.
+* The short pilot uses a compressed schedule solely to exercise both loss
+  phases. Main training starts fresh; pilot weights are never used.
+* DDP find_unused_parameters=True is necessary because the official semantic
+  encoder registers an unused transformer template. Network source unchanged.
+* Validation never perturbs saved training RNG. One image per inference call,
+  exactly the official seed behavior. Validation shards have no repeats/drops.
+* RGB uint8 PSNR, RGB Gaussian-window SSIM (11, sigma1.5, population covariance),
+  MAE and grayscale Laplacian MAE are computed on saved-pixel values. These are
+  clear metrics for this dataset, not the original script's gray SSIM variant.
+  PSNR uses an MSE floor 1e-12 to handle exact matches. PNG quantization rounds.
+* Real Lytro/MFFW inference uses original reflect-padding to multiples of 16,
+  native canvas size, crop before min-max. No tiling or resizing.
+
+Run / resume from workspace /home/dancer/mfif/ICME
+-------------------------------------------------
+OMP_NUM_THREADS=2 OPENBLAS_NUM_THREADS=1 NCCL_P2P_DISABLE=1 \
+  .envs/gmff/bin/python -m torch.distributed.run --standalone --nproc_per_node=8 \
+  Mask-DiFuser/train_mfif.py --config Mask-DiFuser/configs/mfif_scratch_overnight.json
+
+To resume, add:
+  --resume Mask-DiFuser/experiments/mfif_scratch_20261119/checkpoints/last.pt
+
+Resume requires the same world size and numerical/data configuration.
+Change the deadline for a future continuation; otherwise an expired deadline
+will stop the run after one update. Retain max_steps=87500 and schedule settings.
+last.pt contains model, optimizer, warmup/cosine state, data cursor, all rank RNG,
+and configuration. best.pt contains validation-selected fusion model weights.
+Checkpoint writes are atomic. The CUDA/BF16/DDP path is numerically close on
+resume but not bitwise deterministic; see experiments/scratch_resume_verification.json.
+
+Evaluation
+----------
+OMP_NUM_THREADS=2 OPENBLAS_NUM_THREADS=1 NCCL_P2P_DISABLE=1 \
+  .envs/gmff/bin/python -m torch.distributed.run --standalone --nproc_per_node=8 \
+  Mask-DiFuser/evaluate_mfif.py \
+  --checkpoint Mask-DiFuser/experiments/mfif_scratch_20261119/checkpoints/best.pt \
+  --output Mask-DiFuser/experiments/mfif_scratch_20261119/final_evaluation --steps 5
+
+This evaluates the full validation (1496), ID test (1496), disk OOD (374),
+wide-boundary OOD (374), plus 20 Lytro and 13 MFFW pairs at native size.
+The test sets do not choose checkpoints. Best is selected only using the fixed
+64-content validation monitor. Full validation is reported separately.
+Real image sets have no GT metrics. The simple source average is a reference.
+
+Overnight supervision
+---------------------
+run_mfif_overnight.py --config configs/mfif_scratch_overnight.json
+is launched as a detached process. It runs until the configured wall deadline,
+then evaluates best.pt, writes REPORT.txt and training_curves.png, and updates
+job_status.json. It attempts at most one recovery from the last complete
+checkpoint after a nonzero exit, only if sufficient training time remains.
+A hard timeout bounds a stalled worker. Final evaluation is bounded to 1 hour.
+Inspect job_status.json, status.json, train.log, evaluate.log, completion.json,
+and final_evaluation/DONE.json to distinguish running, successful and partial runs.
+
+Primary result folder
+---------------------
+experiments/mfif_scratch_20261119/
+  config.json, provenance.json, monitor_samples.json, code/
+  metrics.jsonl, status.json, job_status.json, REPORT.txt, training_curves.png
+  checkpoints/last.pt, checkpoints/best.pt
+  validation/step_*/summary.json, per_image.jsonl, previews/
+  final_evaluation/{val,test,disk,wide,real}/
+
+The code snapshot and original-source SHA256 audit make future changes reviewable.
+Lower noise loss alone does not establish successful fusion or convergence.

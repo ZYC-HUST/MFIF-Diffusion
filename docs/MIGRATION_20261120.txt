@@ -1,0 +1,24 @@
+实验项目迁移记录（2026-11-20）
+
+原目录：ICME/Mask-DiFuser
+新目录：ICME/MFIF-Diffusion
+
+移动范围：train_mfif.py、evaluate_mfif.py、run_mfif_overnight.py、
+mfif_baseline/、configs/、整个experiments/（约12GB，包含试跑、正式训练、诊断）。
+采用同一文件系统上的目录移动，未重新保存模型文件，未复制出第二份大模型数据。
+
+原Mask-DiFuser源码、原官方权重以及此前已有的其他复现文件均保留原位。
+新项目通过third_party/Mask-DiFuser子模块固定官方Git版本，运行时不再依赖
+旧仓库中混放的实验代码。MFIF数据读取器移入本项目，数据文件仍保留ICME/dataset。
+
+当前配置使用${PROJECT_ROOT}、${DATA_ROOT}占位符，由read_config解析。
+MFIF_DATA_ROOT环境变量可覆盖默认的../dataset。历史实验目录中的config、checkpoint、
+code快照、日志原样保留，出现旧绝对路径属于历史溯源信息。
+reports/baseline_v0是精选轻量历史记录，允许进入Git；完整权重/图像保留在experiments。
+
+模型公式、损失系数、采样设置、随机种子和数据划分没有因迁移而改变。
+迁移复验使用第9000步best权重、完整验证集前16个条目，逐图比较原结果；
+结果写入reports/migration_verification.json。
+
+本项目git remote为用户创建的ZYC-HUST/MFIF-Diffusion。仓库是否已成功推送，
+应以git log和远程refs核对；配置remote本身不代表认证或推送成功。

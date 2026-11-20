@@ -1,0 +1,101 @@
+Mask-DiFuser / COME-MFIF scratch experiment
+
+Initialization: RANDOM. Official fusion checkpoint is never loaded.
+Frozen LPIPS/VGG is used only as the original perceptual loss.
+Official model, losses and MFF sampler are used unchanged.
+Inference: DDIM 5 steps, eta=1, seed=3407, official clipping/indexing/min-max.
+Metrics: mean per-image RGB uint8 PSNR/SSIM; these are not the original gray SSIM.
+Training: 256x256, BF16, 8 GPUs, 1 image/GPU, accumulation=4 (global batch 32).
+AdamW lr=5e-5, wd=1e-4; official warmup/cosine; no gradient clipping.
+Schedule epoch = 25 updates; auxiliary losses after epoch 200.
+Main schedule mapping: DIV2K 800 / original global batch 32 = 25 updates/reference epoch.
+Full MFIF data pass is tracked separately; final incomplete global batch is dropped.
+The checkpoint selected by fixed validation-monitor PSNR is used for final evaluation.
+
+Training status: finished (see completion.json)
+Last logged step: 31225; samples seen: 999200
+Last logged time (UTC): 2026-11-20T00:59:34.072759+00:00
+Noise MSE: 0.001470; loss phase: full
+Recent step time: 1.182s
+Training deadline (UTC): 2026-11-20T01:00:00+00:00
+
+Fixed validation monitor (not the complete validation set):
+step    PSNR(dB)    SSIM       Laplacian-MAE    Average-PSNR(dB)
+     0     6.4861  0.004580   0.948517         31.6998
+   500    13.4889  0.568554   0.080275         31.6998
+  1000    13.7328  0.647712   0.064528         31.6998
+  1500    15.9795  0.709353   0.055135         31.6998
+  2000    11.8860  0.559557   0.067942         31.6998
+  2500    14.6502  0.619224   0.062799         31.6998
+  3000    12.9646  0.591981   0.058552         31.6998
+  3500    13.9323  0.656032   0.055543         31.6998
+  4000    16.8329  0.767490   0.044541         31.6998
+  4500    12.7181  0.564587   0.068894         31.6998
+  5000    14.8133  0.685431   0.056444         31.6998
+  5500    18.9542  0.803106   0.038876         31.6998
+  6000    18.9445  0.759247   0.044846         31.6998
+  6500    20.2376  0.815492   0.037837         31.6998
+  7000    20.8941  0.835898   0.036703         31.6998
+  7500    19.9575  0.839795   0.038877         31.6998
+  8000    20.9508  0.822981   0.038067         31.6998
+  8500    21.1705  0.849098   0.038537         31.6998
+  9000    22.1785  0.862964   0.036125         31.6998
+  9500    19.2013  0.842805   0.038726         31.6998
+ 10000    22.0048  0.867365   0.034450         31.6998
+ 10500    20.3361  0.862294   0.033134         31.6998
+ 11000    21.0072  0.885108   0.031412         31.6998
+ 11500    18.7273  0.870394   0.032835         31.6998
+ 12000    20.5947  0.882157   0.031094         31.6998
+ 12500    19.9389  0.885943   0.028515         31.6998
+ 13000    20.3545  0.886407   0.025924         31.6998
+ 13500    19.9063  0.887083   0.027239         31.6998
+ 14000    18.6948  0.863741   0.032105         31.6998
+ 14500    19.4693  0.877809   0.027971         31.6998
+ 15000    18.6795  0.878158   0.026411         31.6998
+ 15500    19.5531  0.877997   0.024134         31.6998
+ 16000    20.2692  0.886644   0.028331         31.6998
+ 16500    16.3810  0.848925   0.024677         31.6998
+ 17000    21.5373  0.896259   0.027835         31.6998
+ 17500    20.5987  0.888510   0.025344         31.6998
+ 18000    19.5004  0.891058   0.021750         31.6998
+ 18500    20.2518  0.895930   0.022019         31.6998
+ 19000    18.4210  0.880013   0.025244         31.6998
+ 19500    19.8468  0.889310   0.024139         31.6998
+ 20000    18.4104  0.876347   0.025018         31.6998
+ 20500    19.7177  0.892075   0.022144         31.6998
+ 21000    18.4498  0.862280   0.027225         31.6998
+ 21500    19.6176  0.888504   0.023771         31.6998
+ 22000    19.7902  0.890632   0.022496         31.6998
+ 22500    20.0480  0.894372   0.021876         31.6998
+ 23000    16.7941  0.863030   0.024839         31.6998
+ 23500    20.3523  0.896368   0.021072         31.6998
+ 24000    18.9156  0.888596   0.020699         31.6998
+ 24500    19.3965  0.891625   0.023347         31.6998
+ 25000    20.7218  0.899524   0.023414         31.6998
+ 25500    20.9381  0.897921   0.022836         31.6998
+ 26000    18.9104  0.888636   0.021410         31.6998
+ 26500    19.8620  0.898520   0.021023         31.6998
+ 27000    21.0274  0.902012   0.020344         31.6998
+ 27500    21.0837  0.907058   0.019922         31.6998
+ 28000    19.5171  0.895942   0.020068         31.6998
+ 28500    19.5414  0.893439   0.021980         31.6998
+ 29000    21.2093  0.891522   0.019750         31.6998
+ 29500    19.4562  0.890165   0.019887         31.6998
+ 30000    20.5921  0.903077   0.019161         31.6998
+ 30500    19.7697  0.893025   0.019939         31.6998
+ 31000    21.2710  0.904705   0.019899         31.6998
+ 31247    19.0934  0.892852   0.020392         31.6998
+
+Final evaluation checkpoint step: 9000
+dataset    N     PSNR(dB)    SSIM       Laplacian-MAE   Average-PSNR(dB)
+val       1496    22.1083  0.852581   0.037764        31.7018
+test      1496    21.5886  0.848472   0.037595        31.9754
+disk       374    21.4471  0.846822   0.037430        30.9372
+wide       374    21.4523  0.848021   0.037077        31.5483
+Real images: 33 pairs; native-size previews only, no GT metrics.
+Final evaluation status: complete
+
+Do not interpret lower training loss as successful fusion or convergence.
+Compare fusion with the simple source average and inspect detail/brightness in previews.
+OOD results are synthetic robustness checks; real-image previews are qualitative.
+Paths: checkpoints/{last,best}.pt, validation/, final_evaluation/, metrics.jsonl, training_curves.png.

@@ -1,0 +1,159 @@
+颜色/亮度保持与MFIF评价协议：代码核查和实测记录
+日期：2026-11-20
+
+本记录区分代码中真正调用的机制、默认关闭的可选模块、我们提出的实验。
+参考仓库commit固定在reference_code_versions.json；以下路径相对ICME。
+
+一、当前问题的解释与一次无需重训的验证
+====================================
+此前审计显示，last输出的逐图RGB通道均值偏移项平均占MSE的90.2%，
+但结构/高频误差持续改善。因此先检查源图能否提供稳定的低频与色彩参考。
+
+本次用同一64张验证监控图，直接读取已经保存的官方输出；原归一化与原图不变。
+所有校正只使用A、B、F，GT仅用于最后评价。没有GT拟合、没有重训、没有扫描参数。
+Gaussian低频sigma固定为16像素（256x256 patch），边界BORDER_REFLECT_101；
+校正后clip到[0,1]并量化为uint8。代码tools/diagnose_source_color.py。
+
+last（第31247步）的结果：
+方法                 PSNR      SSIM      DeltaE00↓   Laplacian MAE↓
+原官方输出           19.0934   0.89285   12.7117     0.020392
+源图RGB均值校正      30.2020   0.94742    3.5172     0.020340
+源图RGB低频校正      33.7954   0.96358    2.3774     0.020392
+只回填双源平均色度   20.9712   0.90437    7.4585     0.020696
+双源直接平均         31.6998   0.93525    1.7059     0.033926
+
+best（第9000步）：原输出22.1785；源均值26.5378；源低频30.1524；色度回填23.6202 dB。
+详细结果reports/source_color_diagnostic_20261120.json。
+DeltaE00使用skimage的sRGB→Lab（默认D65）及CIEDE2000，先在每张图像素平均，再跨图平均。
+
+结论仅限这64张验证图：后期模型的纹理能力被颜色/亮度漂移严重掩盖，
+解析源低频参考值得优先尝试。last低频校正超过简单平均的PSNR/SSIM，
+但DeltaE00仍略差于平均；不能把单一提升说成所有指标占优。
+这些是后处理诊断，不是新的正式测试成绩，也不能直接算成采样模块的贡献。
+下一步应在剩余验证内容、不同模糊/低频尺度、原尺寸真实MFIF上复核；不能反复调真实测试集。
+
+二、哪些参考方法实际保留了源图颜色
+================================
+
+1. ReDiffuse：真正用于MFIF的Y生成和双源色度回填。
+   ReDiffuse/my_dataset.py:45,61,77：训练源图和GT均提取Y。
+   ReDiffuse/main.py:85,94,108；ReDiffuse/Diffusion.py:266,282：
+   推理用双源Cr/Cb围绕中性128的距离加权，然后与生成Y拼回RGB。
+   C_f=(C_A|C_A-128|+C_B|C_B-128|)/(|C_A-128|+|C_B-128|)，中性时取128。
+   GIFNet/test.py:104,172,197,203也有实际调用的双RGB源色度融合。
+   注意：这是饱和度距离权重，不是焦点置信度；只能解决色度，不能自动校正Y亮度。
+   本次诊断采用对称色度均值，并没有声称复现上述饱和度权重。
+
+2. GMFF：实际调用的参考低频重建。
+   GMFF/gmff/pipeline.py:243,276：run()中调用wavelet_reconstruction(generated,cond_img)。
+   GMFF/gmff/utils/common.py:29,51,66–77：五层扩张平滑分解，返回
+   content_high_freq + style_low_freq。函数内一处注释写style高频，但实际返回是低频。
+   可借鉴其“生成高频+参考低频”，不用照搬初融网络。
+   我们的解析参考可定义R_L=0.5*(G_sigma(A)+G_sigma(B))；
+   F_corr=F+lambda*(R_L-G_sigma(F))，本次lambda=1。
+   这不是GMFF的原始五层滤波实现，而是检验相同思想的简单Gaussian对照。
+   大散焦、边界、配准/曝光差异会破坏源低频相似性，不能无条件当成GT低频。
+
+3. DSPFusion与DuS-DiFuse：分离亮度、色度、梯度监督。
+   DSPFusion/basicsr/losses/basic_loss.py:17,33–35,235,243–245：
+   可微YCbCr分解，分别亮度L1、色度L1。
+   DuS-DiFuse/dus_difuse/losses.py:111,143,161,182,227；
+   DuS-DiFuse/configs/train/drfm.yaml:101：亮度、色度、梯度MSE，示例权重20/50/10。
+   这些IVIF目标不能直接照搬：MFIF有GT，应监督GT的Y/CbCr，不用max(Y_A,Y_B)，
+   也不固定复制A或B色度。权重需要按我们的损失量级重新验证。
+
+4. UltraFusion与FusionINV：有可参考AdaIN模块，但默认未启用。
+   UltraFusion/model/V4_CA/cldm.py:136,147：均值/标准差匹配；
+   :163–174只有tiled decode且consistent_start非空才调用。
+   UltraFusion/inference.py:243却传consistent_start=None，不能说默认用AdaIN校色。
+   它默认实际使用的是结构/色度分离条件与FCB：
+   dataset/test_dataset.py:10–36，inference.py:125–141，
+   pipeline/V4_CA/pipeline.py:83–88，model/V4_CA/cldm.py:181–187。
+   FusionINV/AllinVIS.py:76–96有AdaIN回调，utils/fusion_utils.py:24–31实现；
+   但config.py:35默认adain_range=[90,90)为空，因此不生效。
+   直接匹配模糊源的全频方差可能压低清晰纹理对比度，优先试均值或低频统计。
+
+5. 不能照抄的代码细节。
+   Diff-MEF/loss/Myloss.py:69–70和DRMF/utils/losses.py:21–22把预测Cr/Cb detach，
+   后面的色度损失不通过该项向预测回传色度梯度；另有RGB损失不代表整个训练无颜色梯度。
+   对转换函数做CPU autograd检查得到[Y,Cr,Cb]的requires_grad=[True,False,False]。
+   DSPFusion对应函数没有这处detach，应优先参考可微实现。
+   LFDT-Fusion/test-mff.py:52–62官方仅保存生成Y灰度，不能把本地reproduction中的
+   source_chroma_rgb后处理当成官方MFIF实现。其IVIF复制可见光色度是另一种输入假设。
+   PDFuse/PDFuse.py:24–45,217的颜色转移只处理一灰一彩，双RGB MFIF通常不触发。
+   VDMUFusion/dataset.py:90,103及Diffusion.py:210–217存在OpenCV BGR/RGB标志混用写法，
+   颜色转换不能不核对通道顺序就复制。
+
+三、对本任务的尝试顺序
+====================
+先独立评估源统计/低频校正，保持原官方结果作为baseline-v0；
+再试GT亮度/色度、低频RGB或通道均值的可微监督，检查梯度和数值范围；
+随后将源低频或可靠清晰区域用于每步预测x0修正，并检查修正后的x0与采样更新的一致性。
+这与“清晰源信息怎样参与采样”相容，不需要预训练初融网络。
+最终要把后处理、训练损失、采样约束的贡献分别消融，而不是把便宜的颜色回填包装成生成能力。
+
+四、PSNR/SSIM是否合适
+====================
+有全清晰GT的COME合成验证：保留RGB PSNR和RGB SSIM是正确的。
+PSNR度量像素重建误差，对本次颜色/亮度偏移敏感，低分反映真实的保真损失；
+SSIM补充局部亮度、对比度和结构相似性，但仍不能覆盖所有颜色和细节问题。
+官方Mask-DiFuser/train.py:214–219本身就在合成验证上用GT PSNR和灰度SSIM。
+我们的RGB SSIM与官方灰度计算不同，必须明确协议，不直接横向比较同名数字。
+
+原始依据：
+Wang et al., Image Quality Assessment: From Error Visibility to Structural Similarity, TIP 2004.
+https://www.cns.nyu.edu/pub/eero/wang03-reprint.pdf
+SSIM作者实现/说明：https://ece.uwaterloo.ca/~z70wang/research/ssim/
+
+真实MFIF通常没有全清晰GT，需要来源相关融合指标和感知评估。
+MFIFB列出四类20个指标，没有万能单指标：
+https://arxiv.org/pdf/2005.01116
+https://github.com/xingchenzhang/MFIFB
+TPAMI 2024专门研究20种MFIF指标的可靠性，说明“常用”不等于“无争议可靠”：
+Rethinking the Effectiveness of Objective Evaluation Metrics in Multi-Focus Image Fusion:
+A Statistic-Based Approach. DOI10.1109/TPAMI.2024.3367905
+https://pubmed.ncbi.nlm.nih.gov/38376964/
+
+不同方法在不同阶段选择不同指标：
+Mask-DiFuser：合成验证GT PSNR/SSIM；论文真实MFIF报EN/AG/SF/SD/SCD/PI。
+GMFF：确定性StackMFF阶段PSNR/SSIM，生成阶段BRISQUE/PIQE；后者不证明纹理真实。
+ReDiffuse：Q_abf、Q_MI、Q_G、Q_P、Q_E、源图平均MS-SSIM，最后一项不是GT MS-SSIM。
+LFDT-Fusion：VIF、EN、Q_AB/F、SSIM、FMI。
+ReCoFuse/train.py:304–316：分别验证双源复原X/Y的PSNR，不等于融合图GT评价。
+DiTFuse：SF/AG及LIQE、MUSIQ、CLIPIQA+等感知IQA，不能当成源细节真实性证据。
+
+五、同名指标的实现陷阱
+====================
+IVIF_ZOO/Metric/Metric_torch.py:116的PSNR_function(A,B,F)没有GT，
+误差是0.5*MSE(F,A)+0.5*MSE(F,B)。它等于
+MSE(F,(A+B)/2)+0.25*MSE(A,B)，固定峰值下最优输出是直接平均。
+所以不可用该函数替代GT-PSNR来选择清晰融合模型。
+同文件:295的SSIM是与两源的均值；RFfusion-neurips2025/util/Evaluator.py:215
+则是两源SSIM之和，可能大于1。其:83还用max(F)作为PSNR峰值。
+IVIF_ZOO/Metric/eval_torch.py:91默认只取前300张，直接跑原脚本不一定评完整清单。
+
+代码小实验表明：无裁剪时灰度F加常量20/255，EN/AG/SF/SD/SCD几乎/完全不变，
+但若原F=GT，GT-PSNR降为22.1102 dB。梯度、方差和中心化相关对常量偏移不敏感，
+直方图只平移；灰度指标也会漏掉部分等亮度色偏。因此不能因偏色拉低PSNR就换指标规避。
+
+六、建议的分层评价协议（新增部分为建议，尚未改动训练入口）
+========================================================
+训练/合成验证：
+* 主指标：PSNR-RGB + SSIM-RGB；固定data_range、量化、窗口、颜色空间。
+* 颜色亮度：RGB通道bias、Y MAE、DeltaE00（锁定sRGB→Lab/D65）。
+* 细节：GT梯度/Laplacian误差；LPIPS仅作补充，使用同一训练损失网络不是独立真实性证据。
+* 源保真：按合成已知mask构建边界腐蚀后的可靠清晰区，测F与对应源的像素/梯度误差；
+  不能用模型自己预测的置信度来决定评价区域。
+* 保存best-PSNR、best-SSIM、last和少量周期权重；预先固定最终选模原则。
+
+真实MFIF：
+* 继承用户既有IVIF_ZOO EN/AG/SF/SD/SCD协议，PI单列pyiqa0.1.13例外。
+* 审计后补Q_AB/F（源边缘保留）、N_abf（新增伪影）等，再配局部放大图；
+  MI/FMI、VIF/Q_CB等也是代理指标，不能独立保证无幻觉。
+* 明确无GT融合指标仍可依赖源图，不能与不看源图的盲IQA混为一谈。
+* 不对真实图虚构GT DeltaE；源低频色彩一致性仅能标作诊断代理。
+
+公平性：固定输入分辨率、预处理、源顺序、采样步数与种子；报告多个种子的波动。
+COME同一来源的4个变体不是4个独立场景，置信区间宜按来源/场景分组bootstrap。
+原方法若以min–max作为输出步骤，应明确算作方法的一部分；指标函数不要另做自适应归一化、
+GT仿射对齐或自适应峰值。历史结果的协议标签应保留。

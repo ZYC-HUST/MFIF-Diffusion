@@ -1,0 +1,8 @@
+{
+  "status": "training_finished",
+  "step": 31247,
+  "best_monitor_psnr": 22.17850676160696,
+  "reason": "deadline_or_requested_stop",
+  "training_seconds": 36920.796485286206,
+  "finished_utc": "2026-11-20T01:00:15.059322+00:00"
+}

@@ -1,0 +1,46 @@
+{
+  "ReDiffuse": {
+    "url": "https://github.com/MorvanLi/ReDiffuse.git",
+    "commit": "5a1cf577fd6b58a897d34009372cde15f5424049"
+  },
+  "GMFF": {
+    "url": "https://github.com/Xinzhe99/GMFF.git",
+    "commit": "b7c0d33f7077b899038c097915ca149c0c6c44bf"
+  },
+  "DSPFusion": {
+    "url": "https://github.com/Linfeng-Tang/DSPFusion.git",
+    "commit": "032c0617eda03145e1505c8db6e0099da8e60243"
+  },
+  "DuS-DiFuse": {
+    "url": "https://github.com/Leiii-Cao/DuS-DiFuse.git",
+    "commit": "893f1bfedb6527b4ffade6c98a8962d728d12884"
+  },
+  "GIFNet": {
+    "url": "https://github.com/AWCXV/GIFNet.git",
+    "commit": "e9c83a66a3f2b634a9d9e30269cde601ce40c524"
+  },
+  "UltraFusion": {
+    "url": "https://github.com/OpenImagingLab/UltraFusion.git",
+    "commit": "daee9e90c0b06ad3e3ce35a2fb6c7145a3eed305"
+  },
+  "FusionINV": {
+    "url": "https://github.com/erfect2020/FusionINV.git",
+    "commit": "6950866e33f704977c0b18d1e644f3522a28d41e"
+  },
+  "Diff-MEF": {
+    "url": "https://github.com/hanna-xu/Diff-MEF.git",
+    "commit": "a9ab73c30e012e085bef07d123db31997744cc8c"
+  },
+  "DRMF": {
+    "url": "https://github.com/Linfeng-Tang/DRMF.git",
+    "commit": "a9924b92725b0db2db0907eaf0e7bce27d1bb5bd"
+  },
+  "LFDT-Fusion": {
+    "url": "https://github.com/BOYang-pro/LFDT-Fusion.git",
+    "commit": "92e0f7f21e6a8d0d03c8dc02316444a2e7f87663"
+  },
+  "IVIF_ZOO": {
+    "url": "https://github.com/RollingPlain/IVIF_ZOO.git",
+    "commit": "042225a8f93a10581fbfb20528f60d7b3e02e5f0"
+  }
+}

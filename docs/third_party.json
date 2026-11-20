@@ -1,0 +1,13 @@
+{
+  "mask_difuser": {
+    "url": "https://github.com/Linfeng-Tang/Mask-DiFuser.git",
+    "commit": "9574766fe0ed96c2b8be3b1a63e6998c0a08b768",
+    "path": "third_party/Mask-DiFuser",
+    "method": "Git submodule; upstream algorithms unchanged"
+  },
+  "ivif_metrics": {
+    "path": "../IVIF_ZOO/Metric",
+    "commit": "042225a8f93a10581fbfb20528f60d7b3e02e5f0",
+    "protocol": "docs/evaluation_protocol_inherited.json"
+  }
+}

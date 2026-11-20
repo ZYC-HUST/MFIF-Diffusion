@@ -1,0 +1,16 @@
+{
+  "policy_date": "2026-11-16",
+  "user_preference": "Future image-fusion evaluations use the implementations in IVIF_ZOO/Metric.",
+  "reference_repository": "IVIF_ZOO",
+  "audited_commit": "042225a8f93a10581fbfb20528f60d7b3e02e5f0",
+  "current_metrics": ["EN", "AG", "SF", "SD", "SCD", "PI"],
+  "reference_metrics": ["EN", "AG", "SF", "SD", "SCD"],
+  "reference_source": "IVIF_ZOO/Metric/Metric_torch.py",
+  "reference_preprocessing": "IVIF_ZOO/Metric/eval_torch.py: PIL grayscale, uint8 then torch.float32, no crop or resize",
+  "adapter": "GMFF/ivif_reference_metrics.py: executes the selected reference function bodies without rewriting their formulas",
+  "PI_exception": "IVIF_ZOO has no PI. Continue the separately labeled pyiqa==0.1.13 PerceptualIndex with crop_border=4 on CPU, as documented in GMFF/fusion_metrics.py.",
+  "aggregation": "Unweighted mean over pairs; population standard deviation when reported",
+  "nonfinite_policy": "Fail and report undefined reference scores; never replace them with zero",
+  "historical_results": "Keep existing results and their original protocol labels. This preference applies to future evaluations.",
+  "paper_alignment": "This toolbox is not established as the private evaluator used for Mask-DiFuser's paper tables. Model inference settings remain method-specific."
+}

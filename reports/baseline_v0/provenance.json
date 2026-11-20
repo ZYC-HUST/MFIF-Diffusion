@@ -1,0 +1,22 @@
+{
+  "initialization": "random",
+  "official_weights_loaded": false,
+  "initial_parameter_fingerprint": "748b1c924b7053b744ad992a633f47c463f511b31f10705788f5e8c0f9d52ded",
+  "seed": 20261119,
+  "architecture_parameters": 172326499,
+  "frozen_perceptual_loss": "LPIPS VGG (pretrained loss network only)",
+  "git_commit": "9574766fe0ed96c2b8be3b1a63e6998c0a08b768",
+  "torch": "2.2.2+cu118",
+  "cuda": "11.8",
+  "world_size": 8,
+  "effective_batch": 32,
+  "train_triplets": 110096,
+  "started_utc": "2026-11-19T14:22:51.661313+00:00",
+  "nccl_p2p_disable": "1",
+  "sampler": "unchanged official MFF DDIM, eta=1, common seed, min-max normalization",
+  "official_file_hashes": {
+    "Diffusion/model.py": "de307d8464ab88ad6b904dafe44baeb14d964ca83532207fb0ac54f4fed8b30f",
+    "Diffusion/diffusion.py": "7760797adcb940dc72983f93660aa6c93454875e34493b358c5e7d5a67519ff0",
+    "loss/Myloss.py": "50b67dc943fa267094c0f55f66b4dbde7f02d568f6175c89bf2d4162d1027de6"
+  }
+}
